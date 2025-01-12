@@ -1,4 +1,6 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 namespace Web.Extensions;
 
@@ -39,6 +41,14 @@ internal static class WebApplicationBuilderExtension
                 }
             });
         });
+
+        return builder;
+    }
+
+    internal static WebApplicationBuilder AddData(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddDbContext<PaymentSystemDbContext>(options =>
+            options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQLConnection")));
 
         return builder;
     }
