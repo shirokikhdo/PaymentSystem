@@ -1,4 +1,6 @@
-﻿using Domain;
+﻿using Application.Abstractions;
+using Application.Services;
+using Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -50,6 +52,14 @@ internal static class WebApplicationBuilderExtension
         builder.Services.AddDbContext<PaymentSystemDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQLConnection")));
 
+        return builder;
+    }
+
+    internal static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<ICartsService, CartsService>();
+        builder.Services.AddScoped<IOrdersService, OrdersService>();
+        
         return builder;
     }
 }
