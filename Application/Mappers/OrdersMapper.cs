@@ -11,7 +11,9 @@ public static class OrdersMapper
         {
             Id = entity.Id,
             CustomerId = entity.CustomerId!.Value,
-            Cart = cartEntity?.ToDto(),
+            Cart = cartEntity is null
+                ? entity.Cart?.ToDto()
+                : cartEntity.ToDto(),
             Name = entity.Name,
             OrderNumber = entity.OrderNumber,
         };
