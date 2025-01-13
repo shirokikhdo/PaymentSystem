@@ -1,7 +1,10 @@
 ﻿using Application.Abstractions;
+using Application.Mappers;
 using Application.Models.Orders;
 using Domain;
 using Domain.Entities;
+using Domain.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
@@ -18,6 +21,9 @@ public class OrdersService : IOrdersService
 
     public async Task<OrderDto> Create(CreateOrderDto order)
     {
+        if (order.Cart is null)
+            throw new ArgumentNullException();
+
         var cart = await _cartsService.Create(order.Cart);
 
         var entity = new OrderEntity
@@ -28,35 +34,47 @@ public class OrdersService : IOrdersService
             CartId = cart.Id
         };
 
-        var orderSaveResult = await _dbContext.Orders.AddAsync(entity);
+        await _dbContext.Orders.AddAsync(entity);
         await _dbContext.SaveChangesAsync();
 
-        return new OrderDto
-        {
-            Id = orderSaveResult.Entity.Id,
-            CustomerId = orderSaveResult.Entity.CustomerId!.Value,
-            Cart = cart,
-            Name = orderSaveResult.Entity.Name,
-            OrderNumber = orderSaveResult.Entity.OrderNumber,
-        };
+        return entity.ToDto();
     }
 
-    public Task<OrderDto> GetById(Guid orderId)
+    public async Task<OrderDto> GetById(long orderId)
     {
-        throw new NotImplementedException();
+        var entity = await _dbContext.Orders
+            .Include(x => x.Cart)
+            .ThenInclude(x => x.CartItems)
+            .FirstOrDefaultAsync(x => x.Id == orderId);
+
+        return entity is null
+            ? throw new EntityNotFoundException($"Order entity with id {orderId} not found")
+            : entity.ToDto();
     }
 
-    public Task<List<OrderDto>> GetByUser(Guid customerId)
+    public async Task<List<OrderDto>> GetByUser(long customerId)
     {
-        throw new NotImplementedException();
+        var entities = await _dbContext.Orders
+            .Include(x => x.Cart)
+            .ThenInclude(x => x.CartItems)
+            .Where(x => x.CustomerId == customerId)
+            .ToListAsync();
+
+        return entities.Select(x => x.ToDto()).ToList();
     }
 
-    public Task<List<OrderDto>> GetAll()
+    public async Task<List<OrderDto>> GetAll()
     {
-        throw new NotImplementedException();
+        var entities = await _dbContext.Orders
+            .Include(x => x.Cart)
+            .ThenInclude(x => x.CartItems)
+            .ToListAsync();
+
+        return entities.Select(x => x.ToDto()).ToList();
     }
 
-    public Task Reject(Guid orderId)
+
+    public Task Reject(long orderId)
     {
         throw new NotImplementedException();
     }

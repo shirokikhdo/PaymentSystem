@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Mappers;
 using Application.Models.Carts;
 using Domain;
 using Domain.Entities;
@@ -36,20 +37,8 @@ public class CartsService : ICartsService
 
         var result = await _dbContext.Carts
             .Include(x => x.CartItems)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstAsync(x => x.Id == id);
 
-        return new CartDto
-        {
-            Id = result.Id,
-            CartItems = result.CartItems
-                .Select(item => new CartItemDto
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Price = item.Price,
-                    Quantity = item.Quantity
-                })
-                .ToList()
-        };
+        return result.ToDto();
     }
 }
