@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Application.Abstractions;
 using Application.Models.Orders;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers;
@@ -20,6 +21,7 @@ public class OrdersController : ApiBaseController
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<List<OrderDto>>> GetAll()
     {
         _logger.LogInformation("Method api/orders GetAll started.");
