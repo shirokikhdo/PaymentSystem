@@ -67,6 +67,7 @@ internal static class WebApplicationBuilderExtension
     {
         builder.Services.AddScoped<ICartsService, CartsService>();
         builder.Services.AddScoped<IOrdersService, OrdersService>();
+        builder.Services.AddScoped<IMerchantsService, MerchantsService>();
         
         return builder;
     }

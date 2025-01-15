@@ -14,6 +14,8 @@ public sealed class PaymentSystemDbContext : IdentityDbContext<UserEntity, Ident
 
     public DbSet<OrderEntity> Orders { get; set; } = null!;
 
+    public DbSet<MerchantEntity> Merchants { get; set; } = null!;
+
     public PaymentSystemDbContext(DbContextOptions<PaymentSystemDbContext> options)
         : base(options)
     {

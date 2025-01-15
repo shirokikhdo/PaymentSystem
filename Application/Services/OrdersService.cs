@@ -21,6 +21,14 @@ public class OrdersService : IOrdersService
 
     public async Task<OrderDto> Create(CreateOrderDto order)
     {
+        var orderByOrderNumber = await _dbContext.Orders
+            .FirstOrDefaultAsync(x=>x.OrderNumber == order.OrderNumber 
+                                    && x.MerchantId == order.MerchantId);
+
+        if (orderByOrderNumber != null)
+            throw new DuplicateEntityException(
+                $"Order with orderNumber {order.OrderNumber} is exist for merchant {order.MerchantId}");
+
         if (order.Cart is null)
             throw new ArgumentNullException();
 
