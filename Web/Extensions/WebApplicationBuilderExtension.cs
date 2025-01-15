@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Web.BackgroundServices;
 
 namespace Web.Extensions;
 
@@ -72,6 +73,13 @@ internal static class WebApplicationBuilderExtension
         return builder;
     }
 
+    internal static WebApplicationBuilder AddBackgroundService(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddHostedService<CreateOrderConsumer>();
+
+        return builder;
+    }
+
     internal static WebApplicationBuilder AddBearerAuthorization(this WebApplicationBuilder builder)
     {
         builder.Services
@@ -127,6 +135,7 @@ internal static class WebApplicationBuilderExtension
     internal static WebApplicationBuilder AddOptions(this WebApplicationBuilder builder)
     {
         builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection("Authentification"));
+        builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMQ"));
 
         return builder;
     }

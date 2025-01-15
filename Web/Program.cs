@@ -15,7 +15,8 @@ builder
     .AddOptions()
     .AddSwagger()
     .AddData()
-    .AddApplicationServices();
+    .AddApplicationServices()
+    .AddBackgroundService();
 
 var app = builder.Build();
 app.UseHttpLogging();
