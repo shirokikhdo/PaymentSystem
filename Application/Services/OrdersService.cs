@@ -4,6 +4,7 @@ using Application.Models.Orders;
 using Domain;
 using Domain.Entities;
 using Domain.Exceptions;
+using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
@@ -81,9 +82,15 @@ public class OrdersService : IOrdersService
         return entities.Select(x => x.ToDto()).ToList();
     }
 
-
-    public Task Reject(long orderId)
+    public async Task Reject(long orderId)
     {
-        throw new NotImplementedException();
+        var entity = await _dbContext.Orders
+            .FirstOrDefaultAsync(x => x.Id == orderId);
+
+        if(entity is null)
+            throw new EntityNotFoundException($"Order entity with id {orderId} not found");
+
+        entity.Status = OrderStatusType.Reject;
+        await _dbContext.SaveChangesAsync();
     }
 }
